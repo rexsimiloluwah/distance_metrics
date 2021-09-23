@@ -1,27 +1,14 @@
-package main
+package vector
 
 import (
-	"fmt"
 	"math"
 )
 
 type Vector []float64
 
-func main() {
-	v := Vector{1, 2, 3, 4, 5, 6, 7, 8}
-	u := Vector{2, 4, 6, 8, 10, 12, 14, 16}
-
-	a := Vector{1, 0, 0, 1}
-	b := Vector{0, 0, 0, 1}
-	fmt.Println(Manhattan(v, u))
-	fmt.Println(Euclidean(Vector{0, 3, 4, 5}, Vector{7, 6, 3, -1})) //9.74
-	fmt.Println(Hamming(a, b))
-	fmt.Println(CosineSimilarity(Vector{3, 2, 0, 5}, Vector{1, 0, 0, 0}))
-}
-
 // Computes the Minkowski distance between two vectors
 // Minkowski distance is the generalized metric form of Manhattan and Euclidean distance
-func Minkowski(a Vector, b Vector, p float64) float64 {
+func Minkowski(a Vector, b Vector, p int) float64 {
 
 	if a.Length() == 0 || b.Length() == 0 {
 		panic("Vectors a and b cannot be empty")
@@ -33,9 +20,9 @@ func Minkowski(a Vector, b Vector, p float64) float64 {
 
 	var result float64 = 0
 	for i := 0; i < a.Length(); i++ {
-		result += math.Pow(math.Abs(a.At(i)-b.At(i)), p)
+		result += math.Pow(math.Abs(a.At(i)-b.At(i)), float64(p))
 	}
-	return math.Pow(result, 1/p)
+	return math.Pow(result, 1/float64(p))
 }
 
 // Computes the Manhattan distance between two vectors
@@ -61,8 +48,12 @@ func Chebyshev(a Vector, b Vector) float64 {
 	}
 
 	for i := 0; i < a.Length(); i++ {
-
+		d := math.Abs(a[i] - b[i])
+		if d > result {
+			result = d
+		}
 	}
+	return result
 }
 
 // Computes the Squared euclidean distance between two vectors
@@ -145,6 +136,51 @@ func Hamming(a Vector, b Vector) int {
 	return count
 }
 
+/* Utility functions */
+
+// Add two vectors
+func Add(a Vector, b Vector) Vector {
+	if a.Length() == 0 || b.Length() == 0 {
+		return Vector{}
+	}
+
+	if a.Length() != b.Length() {
+		panic("Vectors a and b must be of the same length.")
+	}
+
+	sum := make(Vector, a.Length())
+	for i := 0; i < a.Length(); i++ {
+		sum[i] = a[i] + b[i]
+	}
+	return sum
+}
+
+// Subtract two vectors
+func Subtract(a Vector, b Vector) Vector {
+	if a.Length() == 0 || b.Length() == 0 {
+		return Vector{}
+	}
+
+	if a.Length() != b.Length() {
+		panic("Vectors a and b must be of the same length.")
+	}
+
+	diff := make(Vector, a.Length())
+	for i := 0; i < a.Length(); i++ {
+		diff[i] = a[i] - b[i]
+	}
+	return diff
+}
+
+// Map an anonymous function to the vector
+func Map(a Vector, f func(a interface{}) interface{}) Vector {
+	result := make(Vector, a.Length())
+	for i := 0; i < a.Length(); i++ {
+		result[i] = f(a[i]).(float64)
+	}
+	return result
+}
+
 // Computes the length (n) of an n-dimensional vector
 func (v Vector) Length() int {
 	return len(v)
@@ -155,7 +191,6 @@ func (v Vector) At(index int) float64 {
 	if index > v.Length()-1 {
 		panic("Vector index out of range.")
 	}
-
 	return v[index]
 }
 
@@ -165,7 +200,6 @@ func (v Vector) Mean() float64 {
 	for _, value := range v {
 		sum += value
 	}
-
 	return sum / float64(v.Length())
 }
 
@@ -175,7 +209,6 @@ func (v Vector) Stdev() float64 {
 	for _, value := range v {
 		result += math.Pow(value-v.Mean(), 2)
 	}
-
 	return math.Sqrt(result / float64(v.Length()-1))
 }
 
@@ -185,7 +218,6 @@ func (v Vector) Magnitude() float64 {
 	for _, value := range v {
 		result += math.Pow(value, 2)
 	}
-
 	return math.Sqrt(result)
 }
 
@@ -199,6 +231,39 @@ func (v Vector) Dot(u Vector) float64 {
 	for i := 0; i < v.Length(); i++ {
 		result += v[i] * u[i]
 	}
-
 	return result
+}
+
+// Computes the index of the maximum element in a a vector
+func (v Vector) Maxarg() int {
+	maxIdx := 0
+	for i := 0; i < v.Length(); i++ {
+		if v[i] > v[maxIdx] {
+			maxIdx = i
+		}
+	}
+	return maxIdx
+}
+
+// Computes the index of the minimum element in a vector
+func (v Vector) Minarg() int {
+	minIdx := 0
+	for i := 0; i < v.Length(); i++ {
+		if v[i] < v[minIdx] {
+			minIdx = i
+		}
+	}
+	return minIdx
+}
+
+// Computes the maximum element in a vector
+func (v Vector) Max() float64 {
+	maxIdx := v.Maxarg()
+	return v[maxIdx]
+}
+
+// Computes the minimum element in a vector
+func (v Vector) Min() float64 {
+	minIdx := v.Minarg()
+	return v[minIdx]
 }
