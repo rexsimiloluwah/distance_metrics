@@ -17,6 +17,7 @@ $ go get -u github.com/rexsimiloluwah/distance_metrics
 ### Tests
 To run a recursive test:-
 ```bash
+$ cd ${GOPATH}/src/github.com/rexsimiloluwah/distance_metrics
 $ go test ./...
 ```
 
