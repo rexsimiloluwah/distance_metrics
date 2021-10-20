@@ -1,7 +1,5 @@
 package set
 
-import "fmt"
-
 type set struct {
 	data map[float64]bool
 	size int
@@ -32,7 +30,7 @@ func Sorensen(s1 *set, s2 *set) float64 {
 	}
 	num := 2 * (s1.Intersection(s2).size)
 	den := s1.size + s2.size
-	fmt.Println(num, den)
+	//fmt.Println(num, den)
 	return float64(num) / float64(den)
 }
 
@@ -86,6 +84,11 @@ func (s *set) Remove(el float64) {
 	} else {
 		panic("This element does not exist in the set.")
 	}
+}
+
+// Returns the size of the set
+func (s *set) Size() int {
+	return s.size
 }
 
 // Convert a set to an array
